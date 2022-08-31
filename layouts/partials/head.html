@@ -2,6 +2,8 @@
 {{ $config := cond (eq $.Site.Language.Lang "en") "config" (printf "config.%s" $.Site.Language.Lang) }}
 {{ $data := index $.Site.Data $config }}
 <head>
+  {{/*  添加umami数据统计  */}}
+  <script async defer data-website-id="08a754c4-6690-46d7-bb80-8ff93cfa232f" src="https://umami.oldwinter.top/umami.js"></script>
   <!-- Meta tags -->
   <meta charset="UTF-8" />
   <meta
