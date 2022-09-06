@@ -1,5 +1,5 @@
 baseURL = "https://garden.oldwinter.top/"
-languageCode = "zh-cn"
+languageCode = "en"
 googleAnalytics = "G-11MD77L81V"
 relativeURLs = false
 disablePathToLower = true
@@ -32,10 +32,3 @@ enableGitInfo = true
         publishDate = ["date created","publishDate", "date"]
     [markup.goldmark.renderer]
         unsafe = true
-
-defaultContentLanguage = 'zh-cn'
-[languages]
-  [languages.zh-cn]
-    languagedirection = 'ltr'
-    title = '简体中文'
-    weight = 1
