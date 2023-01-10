@@ -2,8 +2,7 @@
 {{ $config := cond (eq $.Site.Language.Lang "en") "config" (printf "config.%s" $.Site.Language.Lang) }}
 {{ $data := index $.Site.Data $config }}
 <head>
-  {{/*  添加umami数据统计  */}}
-  <script async defer data-website-id="08a754c4-6690-46d7-bb80-8ff93cfa232f" src="https://umami.oldwinter.top/umami.js"></script>
+
   <!-- Meta tags -->
   <meta charset="UTF-8" />
   <meta
@@ -52,9 +51,13 @@
   <script src="{{$s.Permalink}}"></script>
   {{end}}
   {{partial "katex.html" .}}
-    
-  <script src="https://unpkg.com/@floating-ui/core@0.7.3"></script>
-  <script src="https://unpkg.com/@floating-ui/dom@0.5.4"></script>
+
+  {{ $floating_ui_core := resources.Get "js/floating-ui-core@0.7.3.js" | resources.Fingerprint "md5" | resources.Minify }}
+  <script src="{{$floating_ui_core.Permalink}}"></script>
+  
+  {{ $floating_ui_dom := resources.Get "js/floating-ui.dom.umd.min.js" | resources.Fingerprint "md5" | resources.Minify }}
+  <script src="{{$floating_ui_dom.Permalink}}"></script>
+
   {{ $popover := resources.Get "js/popover.js" | resources.Fingerprint "md5" |
   resources.Minify }}
   <script src="{{$popover.Permalink}}"></script>
