@@ -1,6 +1,5 @@
-baseURL = "https://garden.oldwinter.top/"
+baseURL = "https://yard.remi.fun/"
 languageCode = "en"
-googleAnalytics = "G-11MD77L81V"
 relativeURLs = false
 disablePathToLower = true
 ignoreFiles = [
