@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
-   
+        with:
+          token: ${{ secrets.TOKEN }}
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
@@ -47,7 +48,7 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.TOKEN }}
           publish_dir: ./public
           publish_branch: master  # deploying branch
           cname: yard.remi.fun
