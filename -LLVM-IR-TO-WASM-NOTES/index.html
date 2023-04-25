@@ -1,0 +1,214 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=description content="Description Just a note for C++ -> LLVM IR -> wasm
+Environments ❄️ nix-shell :
+1  $ nix-shell -p llvm clang llvmPackages."><title>🔧 LLVM IR TO WASM NOTES</title><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" type=image/png href=https://yard.remi.fun//icon.png><link href=https://yard.remi.fun/styles.b3e1e36b0403ac565c9392b3e23ef3b6.min.css rel=stylesheet><link href=https://yard.remi.fun/styles/_light_syntax.86a48a52faebeaaf42158b72922b1c90.min.css rel=stylesheet id=theme-link><script src=https://yard.remi.fun/js/darkmode.5cfa1bde2f8b17f3cde61532c0ab4fff.min.js></script>
+<script src=https://yard.remi.fun/js/util.9825137f5e7825e8553c68ce39ac9e44.min.js></script>
+<link rel=stylesheet href=https://yard.remi.fun/styles/katex.min.fd1ecc245b934f1ffb5d7f3ff87d4df8.min.css crossorigin=anonymous><script defer src=https://yard.remi.fun/js/katex.min.bfca83b6fc4c575b0498dd592bc6f83f.min.js crossorigin=anonymous></script>
+<script defer src=https://yard.remi.fun/js/auto-render.min.8634ca81ec07bf42c8a5a6d433a04cd7.min.js crossorigin=anonymous></script>
+<script src=https://yard.remi.fun/js/floating-ui-core@0.7.3.f8ddd209b6a112560ec785151eb73b0c.min.js></script>
+<script src=https://yard.remi.fun/js/floating-ui.dom.umd.min.7752b77240f8bc6e729bc9f7d8d5ce70.min.js></script>
+<script src=https://yard.remi.fun/js/popover.abe6a51cc7138c5dff00f151dd627ad1.min.js></script>
+<script src=https://yard.remi.fun/js/code-title.b35124ad8db0ba37162b886afb711cbc.min.js></script>
+<script src=https://yard.remi.fun/js/clipboard.c20857734e53a3fb733b7443879efa61.min.js></script>
+<script src=https://yard.remi.fun/js/callouts.7723cac461d613d118ee8bb8216b9838.min.js></script>
+<script>const BASE_URL="https://yard.remi.fun/",fetchData=Promise.all([fetch("https://yard.remi.fun/indices/linkIndex.393b49c3c934a95b62f17473c84b7b39.min.json").then(e=>e.json()).then(e=>({index:e.index,links:e.links})),fetch("https://yard.remi.fun/indices/contentIndex.4d2c756347b5320490fff9bec625d16f.min.json").then(e=>e.json())]).then(([{index:e,links:t},n])=>({index:e,links:t,content:n})),render=()=>{const e=new URL(BASE_URL),t=e.pathname,n=window.location.pathname,s=t==n;addCopyButtons(),addCollapsibleCallouts(),initPopover("https://yard.remi.fun",!0,!0);const o=document.getElementById("footer");if(o){const e=document.getElementById("graph-container");if(!e)return requestAnimationFrame(render);e.textContent="";const t=s&&!1;drawGraph("https://yard.remi.fun",t,[{"/moc":"#4388cc"}],t?{centerForce:1,depth:-1,enableDrag:!0,enableLegend:!1,enableZoom:!0,fontSize:.5,linkDistance:1,opacityScale:3,repelForce:1,scale:1.4}:{centerForce:1,depth:1,enableDrag:!0,enableLegend:!1,enableZoom:!0,fontSize:.6,linkDistance:1,opacityScale:3,repelForce:2,scale:1.2})}},init=(e=document)=>{addCopyButtons(),addTitleToCodeBlocks(),renderMathInElement(e.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}],throwOnError:!1})}</script><script>window.Million={navigate:e=>window.location.href=e,prefetch:()=>{}},window.addEventListener("DOMContentLoaded",()=>{init(),render()})</script></head><body><div id=search-container><div id=search-space><input autocomplete=off id=search-bar name=search type=text aria-label=Search placeholder="Search for something..."><div id=results-container></div></div></div><script src=https://yard.remi.fun/js/flexsearch.bundle.045ab27b75ad8ba3b9eb0dc18d3b12ef.min.js crossorigin=anonymous defer></script>
+<script defer src=https://yard.remi.fun/js/full-text-search.24827f874defbbc6d529926cbfcfb493.min.js></script><div class=singlePage><header><h1 id=page-title><a href=https://yard.remi.fun/>Remi IO</a></h1><div class=spacer></div><div id=search-icon><p>Search</p><svg tabindex="0" aria-labelledby="title desc" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title id="title">Search Icon</title><desc id="desc">Icon to open search</desc><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"/><circle cx="8" cy="8" r="7"/></g></svg></div><div class=darkmode><input class=toggle id=darkmode-toggle type=checkbox tabindex=-1>
+<label id=toggle-label-light for=darkmode-toggle tabindex=-1><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="dayIcon" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35"><title>Light Mode</title><path d="M6 17.5C6 16.672 5.328 16 4.5 16h-3C.672 16 0 16.672.0 17.5S.672 19 1.5 19h3C5.328 19 6 18.328 6 17.5zM7.5 26c-.414.0-.789.168-1.061.439l-2 2C4.168 28.711 4 29.086 4 29.5 4 30.328 4.671 31 5.5 31c.414.0.789-.168 1.06-.44l2-2C8.832 28.289 9 27.914 9 27.5 9 26.672 8.329 26 7.5 26zm10-20C18.329 6 19 5.328 19 4.5v-3C19 .672 18.329.0 17.5.0S16 .672 16 1.5v3C16 5.328 16.671 6 17.5 6zm10 3c.414.0.789-.168 1.06-.439l2-2C30.832 6.289 31 5.914 31 5.5 31 4.672 30.329 4 29.5 4c-.414.0-.789.168-1.061.44l-2 2C26.168 6.711 26 7.086 26 7.5 26 8.328 26.671 9 27.5 9zM6.439 8.561C6.711 8.832 7.086 9 7.5 9 8.328 9 9 8.328 9 7.5c0-.414-.168-.789-.439-1.061l-2-2C6.289 4.168 5.914 4 5.5 4 4.672 4 4 4.672 4 5.5c0 .414.168.789.439 1.06l2 2.001zM33.5 16h-3c-.828.0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5h3c.828.0 1.5-.672 1.5-1.5S34.328 16 33.5 16zM28.561 26.439C28.289 26.168 27.914 26 27.5 26c-.828.0-1.5.672-1.5 1.5.0.414.168.789.439 1.06l2 2C28.711 30.832 29.086 31 29.5 31c.828.0 1.5-.672 1.5-1.5.0-.414-.168-.789-.439-1.061l-2-2zM17.5 29c-.829.0-1.5.672-1.5 1.5v3c0 .828.671 1.5 1.5 1.5s1.5-.672 1.5-1.5v-3C19 29.672 18.329 29 17.5 29zm0-22C11.71 7 7 11.71 7 17.5S11.71 28 17.5 28 28 23.29 28 17.5 23.29 7 17.5 7zm0 18c-4.136.0-7.5-3.364-7.5-7.5s3.364-7.5 7.5-7.5 7.5 3.364 7.5 7.5S21.636 25 17.5 25z"/></svg></label><label id=toggle-label-dark for=darkmode-toggle tabindex=-1><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="nightIcon" viewBox="0 0 100 100" style="enable-background='new 0 0 100 100'"><title>Dark Mode</title><path d="M96.76 66.458c-.853-.852-2.15-1.064-3.23-.534-6.063 2.991-12.858 4.571-19.655 4.571C62.022 70.495 50.88 65.88 42.5 57.5 29.043 44.043 25.658 23.536 34.076 6.47c.532-1.08.318-2.379-.534-3.23-.851-.852-2.15-1.064-3.23-.534-4.918 2.427-9.375 5.619-13.246 9.491-9.447 9.447-14.65 22.008-14.65 35.369.0 13.36 5.203 25.921 14.65 35.368s22.008 14.65 35.368 14.65c13.361.0 25.921-5.203 35.369-14.65 3.872-3.871 7.064-8.328 9.491-13.246C97.826 68.608 97.611 67.309 96.76 66.458z"/></svg></label></div></header><article><h1>🔧 LLVM IR TO WASM NOTES</h1><p class=meta>Last updated
+Apr 25, 2023</p><ul class=tags><li><a href=https://yard.remi.fun/tags/linux/>Linux</a></li><li><a href=https://yard.remi.fun/tags/os/>Os</a></li><li><a href=https://yard.remi.fun/tags/tools/>Tools</a></li></ul><aside class=mainTOC><details><summary>Table of Contents</summary><nav id=TableOfContents><ol><li><a href=#description>Description</a></li><li><a href=#environments>Environments</a></li><li><a href=#code>Code</a><ol><li><a href=#ir-generator>IR generator</a></li><li><a href=#build--generate-ir>Build & Generate IR</a></li><li><a href=#run-hellowasm-by-nodejs-runtim>Run hello.wasm by nodejs runtim</a></li></ol></li></ol></nav></details></aside><a href=#description><h2 id=description><span class=hanchor arialabel=Anchor># </span>Description</h2></a><p>Just a note for C++ -> LLVM IR -> wasm</p><a href=#environments><h2 id=environments><span class=hanchor arialabel=Anchor># </span>Environments</h2></a><p>❄️ nix-shell :</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ nix-shell -p llvm clang llvmPackages.llvm  llvmPackages.lld llvmPackages.libcxx llvmPackages.libcxxabi wasmer wasmtime
+</span></span></code></pre></td></tr></table></div></div><a href=#code><h2 id=code><span class=hanchor arialabel=Anchor># </span>Code</h2></a><a href=#ir-generator><h3 id=ir-generator><span class=hanchor arialabel=Anchor># </span>IR generator</h3></a><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C++ data-lang=C++><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/ADT/APFloat.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/BasicBlock.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/Constants.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/DerivedTypes.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/Function.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/IRBuilder.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/LLVMContext.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/Module.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/Type.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;llvm/IR/Verifier.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=k>using</span> <span class=k>namespace</span> <span class=n>llvm</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>LLVMContext</span> <span class=n>context</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>IRBuilder</span><span class=o>&lt;&gt;</span> <span class=n>builder</span><span class=p>(</span><span class=n>context</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>std</span><span class=o>::</span><span class=n>unique_ptr</span><span class=o>&lt;</span><span class=n>Module</span><span class=o>&gt;</span> <span class=n>module</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>make_unique</span><span class=o>&lt;</span><span class=n>Module</span><span class=o>&gt;</span><span class=p>(</span><span class=s>&#34;helloworld&#34;</span><span class=p>,</span> <span class=n>context</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Declare &#34;puts&#34; function
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=n>Type</span> <span class=o>*&gt;</span> <span class=n>puts_args</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>puts_args</span><span class=p>.</span><span class=n>push_back</span><span class=p>(</span><span class=n>Type</span><span class=o>::</span><span class=n>getInt8PtrTy</span><span class=p>(</span><span class=n>context</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>    <span class=n>FunctionType</span> <span class=o>*</span><span class=n>puts_func_type</span> <span class=o>=</span> <span class=n>FunctionType</span><span class=o>::</span><span class=n>get</span><span class=p>(</span><span class=n>Type</span><span class=o>::</span><span class=n>getInt32Ty</span><span class=p>(</span><span class=n>context</span><span class=p>),</span> <span class=n>puts_args</span><span class=p>,</span> <span class=nb>false</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>Function</span> <span class=o>*</span><span class=n>puts_func</span> <span class=o>=</span> <span class=n>Function</span><span class=o>::</span><span class=n>Create</span><span class=p>(</span><span class=n>puts_func_type</span><span class=p>,</span> <span class=n>Function</span><span class=o>::</span><span class=n>ExternalLinkage</span><span class=p>,</span> <span class=s>&#34;puts&#34;</span><span class=p>,</span> <span class=n>module</span><span class=p>.</span><span class=n>get</span><span class=p>());</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Create main function
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>FunctionType</span> <span class=o>*</span><span class=n>main_func_type</span> <span class=o>=</span> <span class=n>FunctionType</span><span class=o>::</span><span class=n>get</span><span class=p>(</span><span class=n>Type</span><span class=o>::</span><span class=n>getInt32Ty</span><span class=p>(</span><span class=n>context</span><span class=p>),</span> <span class=nb>false</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>Function</span> <span class=o>*</span><span class=n>main_func</span> <span class=o>=</span> <span class=n>Function</span><span class=o>::</span><span class=n>Create</span><span class=p>(</span><span class=n>main_func_type</span><span class=p>,</span> <span class=n>Function</span><span class=o>::</span><span class=n>ExternalLinkage</span><span class=p>,</span> <span class=s>&#34;main&#34;</span><span class=p>,</span> <span class=n>module</span><span class=p>.</span><span class=n>get</span><span class=p>());</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Create basic block for main function
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>BasicBlock</span> <span class=o>*</span><span class=n>entry_block</span> <span class=o>=</span> <span class=n>BasicBlock</span><span class=o>::</span><span class=n>Create</span><span class=p>(</span><span class=n>context</span><span class=p>,</span> <span class=s>&#34;entry&#34;</span><span class=p>,</span> <span class=n>main_func</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>builder</span><span class=p>.</span><span class=n>SetInsertPoint</span><span class=p>(</span><span class=n>entry_block</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Create &#34;Hello, World!&#34; constant string
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>Constant</span> <span class=o>*</span><span class=n>hello_world</span> <span class=o>=</span> <span class=n>builder</span><span class=p>.</span><span class=n>CreateGlobalStringPtr</span><span class=p>(</span><span class=s>&#34;Hello, World!</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Call &#34;puts&#34; function with &#34;Hello, World!&#34; as argument
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>builder</span><span class=p>.</span><span class=n>CreateCall</span><span class=p>(</span><span class=n>puts_func</span><span class=p>,</span> <span class=n>hello_world</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Return 0
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>builder</span><span class=p>.</span><span class=n>CreateRet</span><span class=p>(</span><span class=n>ConstantInt</span><span class=o>::</span><span class=n>get</span><span class=p>(</span><span class=n>Type</span><span class=o>::</span><span class=n>getInt32Ty</span><span class=p>(</span><span class=n>context</span><span class=p>),</span> <span class=mi>0</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Verify main function
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>verifyFunction</span><span class=p>(</span><span class=o>*</span><span class=n>main_func</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// Print generated IR
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>module</span><span class=o>-&gt;</span><span class=n>print</span><span class=p>(</span><span class=n>outs</span><span class=p>(),</span> <span class=k>nullptr</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><a href=#build--generate-ir><h3 id=build--generate-ir><span class=hanchor arialabel=Anchor># </span>Build & Generate IR</h3></a><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>$ clang++ -std<span class=o>=</span>c++11 <span class=sb>`</span>llvm-config --cxxflags --ldflags --libs core<span class=sb>`</span> -o ll.out ll.cpp
+</span></span><span class=line><span class=cl>$ ./ll.out
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>;</span> <span class=nv>ModuleID</span> <span class=o>=</span> <span class=s1>&#39;helloworld&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>source_filename</span> <span class=o>=</span> <span class=s2>&#34;helloworld&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>@0 <span class=o>=</span> private unnamed_addr constant <span class=o>[</span><span class=m>15</span> x i8<span class=o>]</span> c<span class=s2>&#34;Hello, World!\0A\00&#34;</span>, align <span class=m>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>declare</span> i32 @puts<span class=o>(</span>i8*<span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>define i32 @main<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>entry:
+</span></span><span class=line><span class=cl>  %0 <span class=o>=</span> call i32 @puts<span class=o>(</span>i8* getelementptr inbounds <span class=o>([</span><span class=m>15</span> x i8<span class=o>]</span>, <span class=o>[</span><span class=m>15</span> x i8<span class=o>]</span>* @0, i32 0, i32 0<span class=o>))</span>
+</span></span><span class=line><span class=cl>  ret i32 <span class=m>0</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>$ ./ll.out &gt;&gt; ll.ll
+</span></span><span class=line><span class=cl>$ llc -march<span class=o>=</span>wasm32 -filetype<span class=o>=</span>obj hello.ll -o hello.o
+</span></span><span class=line><span class=cl>$ wasm-ld --no-entry --export-dynamic --allow-undefined --import-memory hello.o -o hello.wasm
+</span></span></code></pre></td></tr></table></div></div><a href=#run-hellowasm-by-nodejs-runtim><h3 id=run-hellowasm-by-nodejs-runtim><span class=hanchor arialabel=Anchor># </span>Run hello.wasm by nodejs runtim</h3></a><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>fs</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;fs&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>wasmCode</span> <span class=o>=</span> <span class=nx>fs</span><span class=p>.</span><span class=nx>readFileSync</span><span class=p>(</span><span class=s1>&#39;hello.wasm&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>wasmImports</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>env</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>memory</span><span class=o>:</span> <span class=k>new</span> <span class=nx>WebAssembly</span><span class=p>.</span><span class=nx>Memory</span><span class=p>({</span> <span class=nx>initial</span><span class=o>:</span> <span class=mi>256</span> <span class=p>}),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>memoryBase</span><span class=o>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>table</span><span class=o>:</span> <span class=k>new</span> <span class=nx>WebAssembly</span><span class=p>.</span><span class=nx>Table</span><span class=p>({</span> <span class=nx>initial</span><span class=o>:</span> <span class=mi>0</span><span class=p>,</span> <span class=nx>element</span><span class=o>:</span> <span class=s1>&#39;anyfunc&#39;</span> <span class=p>}),</span>
+</span></span><span class=line><span class=cl>    <span class=nx>tableBase</span><span class=o>:</span> <span class=mi>0</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=nx>puts</span><span class=o>:</span> <span class=p>(</span><span class=nx>ptr</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=kr>const</span> <span class=nx>memory</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Uint8Array</span><span class=p>(</span><span class=nx>wasmImports</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>memory</span><span class=p>.</span><span class=nx>buffer</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=kd>let</span> <span class=nx>str</span> <span class=o>=</span> <span class=s1>&#39;&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>while</span> <span class=p>(</span><span class=nx>memory</span><span class=p>[</span><span class=nx>ptr</span><span class=p>]</span> <span class=o>!==</span> <span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>str</span> <span class=o>+=</span> <span class=nb>String</span><span class=p>.</span><span class=nx>fromCharCode</span><span class=p>(</span><span class=nx>memory</span><span class=p>[</span><span class=nx>ptr</span><span class=p>]);</span>
+</span></span><span class=line><span class=cl>        <span class=nx>ptr</span><span class=o>++</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>str</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>WebAssembly</span><span class=p>.</span><span class=nx>instantiate</span><span class=p>(</span><span class=nx>wasmCode</span><span class=p>,</span> <span class=nx>wasmImports</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>.</span><span class=nx>then</span><span class=p>((</span><span class=nx>wasmModule</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kr>const</span> <span class=nx>mainFunc</span> <span class=o>=</span> <span class=nx>wasmModule</span><span class=p>.</span><span class=nx>instance</span><span class=p>.</span><span class=nx>exports</span><span class=p>.</span><span class=nx>main</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>mainFunc</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=p>})</span>
+</span></span><span class=line><span class=cl>  <span class=p>.</span><span class=k>catch</span><span class=p>((</span><span class=nx>error</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;Error:&#39;</span><span class=p>,</span> <span class=nx>error</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=p>});</span>
+</span></span></code></pre></td></tr></table></div></div></article><hr><div class=page-end id=footer><div class=backlinks-container><h3>Backlinks</h3><ul class=backlinks><li><a href=/-BLOGS/ data-ctx="🔧 LLVM IR TO WASM NOTES" data-src=/-BLOGS class=internal-link></a></li></ul></div><div><script src=https://yard.remi.fun/js/d3.min.5fa4aade6937f0a39534e52332561c1e.js crossorigin=anonymous></script><h3>Interactive Graph</h3><div id=graph-container></div><style>:root{--g-node:var(--secondary);--g-node-active:var(--primary);--g-node-inactive:var(--visited);--g-link:var(--outlinegray);--g-link-active:#5a7282}</style><script src=https://yard.remi.fun/js/graph.abd4bc2af3869a96524d7d23b76152c7.js></script></div></div><hr><script src=https://giscus.app/client.js data-repo=u-u-z/back-yard-content data-repo-id=R_kgDOIvYVMQ data-category=General data-category-id=DIC_kwDOIvYVMc4CTfN3 data-mapping=title data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=bottom data-theme=preferred_color_scheme data-lang=zh-CN crossorigin=anonymous async></script></div></body></html>
